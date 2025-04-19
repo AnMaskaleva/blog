@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, get_object_or_404
 from .models import Post
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def post_list(request):
     post_list = Post.published.all()
@@ -11,6 +11,8 @@ def post_list(request):
     page_number = request.GET.get('page', 1)
     try:
         posts = paginator.page(page_number)
+    except PageNotAnInteger:#если страница указана не целым числом то выдать первую страницу
+        posts = paginator.page(1)
     except EmptyPage:#Если указанная страница вне диапазона, то выдать последнюю страницу
         posts = paginator.page(paginator.num_pages)
     return render(request, 'blog/post/list.html',{'posts':posts})
